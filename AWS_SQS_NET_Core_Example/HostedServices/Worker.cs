@@ -1,6 +1,7 @@
 ﻿using Amazon.SQS;
 using Amazon.SQS.Model;
 using AWS_SQS_NET_Core_Example.Core.Messages;
+using MediatR;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
@@ -15,11 +16,13 @@ namespace AWS_SQS_NET_Core_Example.HostedServices
     {
         private readonly IAmazonSQS _amazonSQS;
         private readonly AWSSQSHelper _helper;
+        private readonly IMediator _mediator;
 
-        public Worker(IAmazonSQS amazonSQS, AWSSQSHelper helper)
+        public Worker(IAmazonSQS amazonSQS, AWSSQSHelper helper, IMediator mediator)
         {
             _amazonSQS = amazonSQS ?? throw new ArgumentNullException(nameof(amazonSQS));
             _helper = helper ?? throw new ArgumentNullException(nameof(helper));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -57,6 +60,7 @@ namespace AWS_SQS_NET_Core_Example.HostedServices
                         var @event = JsonConvert.DeserializeObject<CustomerCreatedEvent>(msg.Body);
 
                         //consumer @event
+                        await _mediator.Send(@event);
 
                         var deleteMessageRequest = new DeleteMessageRequest
                         {

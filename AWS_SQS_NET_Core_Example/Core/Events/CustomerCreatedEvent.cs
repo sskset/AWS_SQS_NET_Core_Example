@@ -1,9 +1,10 @@
 ﻿using AWS_SQS_NET_Core_Example.Database.Entities;
+using MediatR;
 using System;
 
 namespace AWS_SQS_NET_Core_Example.Core.Messages
 {
-    public class CustomerCreatedEvent
+    public class CustomerCreatedEvent : IRequest
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Customer Customer { get; set; }
